@@ -1,0 +1,33 @@
+services:
+  autopsy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        AUTOPSY_VERSION: ${AUTOPSY_VERSION:-4.23.0}
+        AUTOPSY_ZIP: ${AUTOPSY_ZIP:-}
+        SLEUTHKIT_VERSION: ${SLEUTHKIT_VERSION:-4.15.0}
+    container_name: autopsy
+    platform: linux/amd64
+    init: true
+    shm_size: ${AUTOPSY_SHM_SIZE:-2gb}
+    ports:
+      - "${AUTOPSY_NOVNC_PORT:-6080}:6080"
+      - "${AUTOPSY_VNC_PORT:-5900}:5900"
+    environment:
+      TZ: ${TZ:-UTC}
+      AUTOPSY_RESOLUTION: ${AUTOPSY_RESOLUTION:-1920x1080}
+      DISPLAY_WIDTH: ${DISPLAY_WIDTH:-1920}
+      DISPLAY_HEIGHT: ${DISPLAY_HEIGHT:-1080}
+      DISPLAY_DEPTH: ${DISPLAY_DEPTH:-24}
+      VNC_PASSWORD: ${VNC_PASSWORD:-}
+      AUTOPSY_USERDIR: /config/userdir
+      AUTOPSY_CACHEDIR: /config/cachedir
+      AUTOPSY_WORKDIR: /cases
+      AUTOPSY_EXTRA_ARGS: ${AUTOPSY_EXTRA_ARGS:-}
+    volumes:
+      - ./cases:/cases
+      - ./config:/config
+      - ./evidence:/evidence:ro
+      - ./downloads:/downloads
+    restart: unless-stopped
